@@ -6,7 +6,7 @@ using SimpleApi.Models;
 
 namespace SimpleApi.Tests;
 
-public class ProjectEstimatesControllerTests : IDisposable
+public sealed class ProjectEstimatesControllerTests : IDisposable
 {
     private readonly ProjectContext _context;
     private readonly ProjectEstimatesController _controller;

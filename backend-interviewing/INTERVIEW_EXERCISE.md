@@ -1,98 +1,52 @@
-# Interview Exercise: Implement Landscaping Pricing System
+# Interview Exercise: Landscaping Pricing System
 
 ## Background
-The landscaping estimation system needs a pricing calculation method. The `CalculateBasePrice` method currently returns 0 and needs to be implemented.
+You are working with a landscaping estimation system that calculates pricing for different types of projects. The system has been implemented and is currently in use.
 
-## Current State
-The pricing logic is not implemented. The `CalculateBasePrice` method contains only a TODO comment and returns 0.
+## Exercise: Add On-Demand Work Pricing
 
-## Exercise: Implement Pricing System
+### Your Task
+Add a new pricing model for on-demand work to the existing landscaping estimation system. This should include:
 
-### Requirements
-Implement pricing logic for landscaping projects with the following categories:
+- Implementing the pricing logic for on-demand work
+- Ensuring the new model integrates with existing functionality
+- Adding appropriate test coverage
+- Maintaining code quality and maintainability
 
-#### Project Types:
-- **Standard** - Regular landscaping work
-- **Custom** - Custom design and implementation  
-- **Peak** - High-demand season (spring/summer)
-- **OffSeason** - Low-demand season (winter)
-- **Rush** - Expedited timeline
-- **Emergency** - Same-day/urgent work
+### On-Demand Pricing Requirements
 
-#### Duration Tiers:
-- **Short-term (≤30 days)**: Quick projects
-- **Medium-term (31-90 days)**: Standard projects  
-- **Long-term (>90 days)**: Extended projects
+#### Pricing Structure
+- **Base Rate**: $150 per hour for on-demand work
+- **Minimum Charge**: 2-hour minimum per visit
+- **Travel Fee**: $25 for locations >15 miles from base
+- **Weekend/Holiday Premium**: 1.5x multiplier for weekends and holidays
+- **Same-Day Service**: Additional $50 rush fee for same-day requests
 
-#### Pricing Matrix:
-| Project Type | Short-term | Medium-term | Long-term |
-|--------------|------------|-------------|-----------|
-| **Standard** | $3,750 | $2,500 | $1,800 |
-| **Custom** | $7,500 | $5,000 | $3,200 |
-| **Peak** | $15,000 | $10,000 | $6,400 |
-| **OffSeason** | $3,000 | $2,000 | $1,200 |
-| **Rush** | $12,000 | $8,000 | $4,800 |
-| **Emergency** | $18,000 | $12,000 | $8,000 |
+### What You Have Access To
+- The complete codebase including controllers, models, and tests
+- Existing test cases that demonstrate expected behavior
+- The current pricing calculation logic
 
 ### Constraints
-- **Time Limit**: 30 minutes
-- **Scope**: Only modify the `CalculateBasePrice` method in `ProjectEstimatesController.cs`
-- **No New Files**: Do not create new files or classes
-- **No Dependencies**: Do not add new dependencies or interfaces
-- **Backward Compatibility**: All existing project types must continue to work
+- **Scope**: Review existing code and add on-demand work as a new pricing model
+- **No Breaking Changes**: Maintain backward compatibility
+- **Focus**: Code quality, maintainability, and business logic correctness
 
 ### Success Criteria
-
-- [ ] All project types return correct pricing for all duration ranges
-- [ ] Invalid project types return a reasonable default (Standard pricing)
-- [ ] No compilation errors
-- [ ] Code is readable and maintainable
-
-### Example Test Cases
-
-```csharp
-// Standard project type
-CalculateBasePrice("Standard", 20)   // Should return 3750
-CalculateBasePrice("Standard", 60)   // Should return 2500
-CalculateBasePrice("Standard", 120)  // Should return 1800
-
-// Custom project type
-CalculateBasePrice("Custom", 20)     // Should return 7500
-CalculateBasePrice("Custom", 60)     // Should return 5000
-CalculateBasePrice("Custom", 120)    // Should return 3200
-
-// Peak project type
-CalculateBasePrice("Peak", 20)       // Should return 15000
-CalculateBasePrice("Peak", 60)       // Should return 10000
-CalculateBasePrice("Peak", 120)      // Should return 6400
-
-// OffSeason project type
-CalculateBasePrice("OffSeason", 20)  // Should return 3000
-CalculateBasePrice("OffSeason", 60)  // Should return 2000
-CalculateBasePrice("OffSeason", 120) // Should return 1200
-
-// Rush project type
-CalculateBasePrice("Rush", 20)       // Should return 12000
-CalculateBasePrice("Rush", 60)       // Should return 8000
-CalculateBasePrice("Rush", 120)      // Should return 4800
-
-// Emergency project type
-CalculateBasePrice("Emergency", 20)  // Should return 18000
-CalculateBasePrice("Emergency", 60)  // Should return 12000
-CalculateBasePrice("Emergency", 120) // Should return 8000
-
-// Invalid project type (should default to Standard)
-CalculateBasePrice("Invalid", 20)    // Should return 3750
-```
+- Implement on-demand work pricing logic
+- Ensure integration with existing pricing models
+- Add comprehensive test coverage for the new functionality
+- Maintain backward compatibility with existing features
+- Consider edge cases and error handling
+- Write clean, maintainable code
 
 ### What This Tests
-
-- **Problem Solving**: How to add new functionality to existing code
-- **Code Reading**: Understanding existing patterns and logic
-- **Attention to Detail**: Ensuring all duration ranges are handled
-- **Code Quality**: Writing clean, readable code within constraints
-- **Testing**: Verifying the solution works correctly
+- **Feature Implementation**: Ability to add new functionality to existing code
+- **Code Integration**: Understanding how to extend existing systems
+- **Business Logic**: Designing appropriate pricing models
+- **Testing Skills**: Writing comprehensive tests for new features
+- **Code Quality**: Writing clean, maintainable code
 
 ### Time Estimate
-- **Target**: 15-30 minutes
-- **Focus**: Simple, focused refactoring task
+- **Target**: 30-45 minutes
+- **Focus**: Implementing on-demand work pricing functionality
