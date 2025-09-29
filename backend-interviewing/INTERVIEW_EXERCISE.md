@@ -6,12 +6,13 @@ You are working with a landscaping estimation system that calculates pricing for
 ## Exercise: Add On-Demand Work Pricing
 
 ### Your Task
-Add a new pricing model for on-demand work to the existing landscaping estimation system. This should include:
+Add a new pricing model for on-demand work to the existing landscaping estimation system. The current implementation may have some areas that could be improved, so feel free to refactor as needed while adding the new functionality. This should include:
 
 - Implementing the pricing logic for on-demand work
 - Ensuring the new model integrates with existing functionality
 - Adding appropriate test coverage
 - Maintaining code quality and maintainability
+- Refactoring existing code if you identify opportunities for improvement
 
 ### On-Demand Pricing Requirements
 
