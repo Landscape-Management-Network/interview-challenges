@@ -14,6 +14,11 @@ Add a new pricing model for on-demand work to the existing landscaping estimatio
 - Maintaining code quality and maintainability
 - Refactoring existing code if you identify opportunities for improvement
 
+### Types of Pricing
+- Design/Build - design and then build a project for a customer e.g. add a deck to a house (already exists)
+- Recurring Service - Perform a recurring task for a customer e.g. Mow the customer's lawn each week (already exists)
+- On-Demand - Perform a task when/if its needed e.g. snow removal (new)
+
 ### On-Demand Pricing Requirements
 
 #### Pricing Structure
