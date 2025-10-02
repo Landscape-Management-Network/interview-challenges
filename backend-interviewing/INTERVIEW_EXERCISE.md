@@ -17,11 +17,8 @@ Add a new pricing model for on-demand work to the existing landscaping estimatio
 ### On-Demand Pricing Requirements
 
 #### Pricing Structure
-- **Base Rate**: $150 per hour for on-demand work
-- **Minimum Charge**: 2-hour minimum per visit
+- **Base Rate**: $150 per service for on-demand work
 - **Travel Fee**: $25 for locations >15 miles from base
-- **Weekend/Holiday Premium**: 1.5x multiplier for weekends and holidays
-- **Same-Day Service**: Additional $50 rush fee for same-day requests
 
 ### What You Have Access To
 - The complete codebase including controllers, models, and tests

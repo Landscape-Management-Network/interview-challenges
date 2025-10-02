@@ -9,7 +9,6 @@ namespace SimpleApi.Tests;
 public sealed class ProjectEstimatesControllerTests : IDisposable
 {
     private readonly ProjectContext _context;
-    private readonly ProjectEstimatesController _controller;
 
     public ProjectEstimatesControllerTests()
     {
@@ -23,22 +22,21 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         // Clear seeded data
         _context.ProjectEstimates.RemoveRange(_context.ProjectEstimates);
         _context.SaveChanges();
-
-        _controller = new ProjectEstimatesController(_context);
     }
 
     [Fact]
     public async Task GetProjectEstimates_ReturnsAllEstimates()
     {
         // Arrange
-        var estimate1 = new ProjectEstimate { ProjectName = "Test Project 1", ClientName = "John Doe", ClientEmail = "john@test.com", EstimatedCost = 10000 };
-        var estimate2 = new ProjectEstimate { ProjectName = "Test Project 2", ClientName = "Jane Smith", ClientEmail = "jane@test.com", EstimatedCost = 20000 };
+        var estimate1 = new ProjectEstimate { ProjectName = "Test Project 1", ClientName = "John Doe", ClientEmail = "john@test.com", TotalEstimatedCost = 10000 };
+        var estimate2 = new ProjectEstimate { ProjectName = "Test Project 2", ClientName = "Jane Smith", ClientEmail = "jane@test.com", TotalEstimatedCost = 20000 };
 
         _context.ProjectEstimates.AddRange(estimate1, estimate2);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _controller.GetProjectEstimates();
+        var controller = new GetProjectEstimatesController(_context);
+        var result = await controller.GetProjectEstimates();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -50,12 +48,13 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
     public async Task GetProjectEstimate_WithValidId_ReturnsEstimate()
     {
         // Arrange
-        var estimate = new ProjectEstimate { ProjectName = "Test Project", ClientName = "John Doe", ClientEmail = "john@test.com", EstimatedCost = 15000 };
+        var estimate = new ProjectEstimate { ProjectName = "Test Project", ClientName = "John Doe", ClientEmail = "john@test.com", TotalEstimatedCost = 15000 };
         _context.ProjectEstimates.Add(estimate);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _controller.GetProjectEstimate(estimate.Id);
+        var controller = new GetProjectEstimateController(_context);
+        var result = await controller.GetProjectEstimate(estimate.Id);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -67,7 +66,8 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
     public async Task GetProjectEstimate_WithInvalidId_ReturnsNotFound()
     {
         // Act
-        var result = await _controller.GetProjectEstimate(999);
+        var controller = new GetProjectEstimateController(_context);
+        var result = await controller.GetProjectEstimate(999);
 
         // Assert
         Assert.IsType<NotFoundResult>(result.Result);
@@ -77,10 +77,11 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
     public async Task CreateProjectEstimate_WithValidData_CreatesEstimate()
     {
         // Arrange
-        var estimate = new ProjectEstimate { ProjectName = "New Project", ClientName = "John Doe", ClientEmail = "john@test.com", EstimatedCost = 25000 };
+        var estimate = new ProjectEstimate { ProjectName = "New Project", ClientName = "John Doe", ClientEmail = "john@test.com", TotalEstimatedCost = 25000 };
 
         // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
+        var controller = new CreateProjectEstimatesController(_context);
+        var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
@@ -93,7 +94,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateProjectEstimate_DesignBuild_Standard_ShortTerm_CalculatesCorrectPrice()
+    public async Task CreateProjectEstimate_DesignBuild_Standard_ShortTerm_CalculatesCorrectTotalCost()
     {
         // Arrange
         var estimate = new ProjectEstimate 
@@ -107,16 +108,17 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
+        var controller = new CreateProjectEstimatesController(_context);
+        var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
         var createdEstimate = Assert.IsType<ProjectEstimate>(createdResult.Value);
-        Assert.Equal(3750m, createdEstimate.EstimatedCost);
+        Assert.Equal(3750m, createdEstimate.TotalEstimatedCost);
     }
 
     [Fact]
-    public async Task CreateProjectEstimate_DesignBuild_Custom_MediumTerm_CalculatesCorrectPrice()
+    public async Task CreateProjectEstimate_DesignBuild_Custom_MediumTerm_CalculatesCorrectTotalCost()
     {
         // Arrange
         var estimate = new ProjectEstimate 
@@ -130,16 +132,17 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
+        var controller = new CreateProjectEstimatesController(_context);
+        var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
         var createdEstimate = Assert.IsType<ProjectEstimate>(createdResult.Value);
-        Assert.Equal(10000m, createdEstimate.EstimatedCost); // 2500 * 2.0 = 5000
+        Assert.Equal(5000m, createdEstimate.TotalEstimatedCost); // 2500 * 2.0 = 5000
     }
 
     [Fact]
-    public async Task CreateProjectEstimate_DesignBuild_Peak_LongTerm_CalculatesCorrectPrice()
+    public async Task CreateProjectEstimate_DesignBuild_Peak_LongTerm_CalculatesCorrectTotalCost()
     {
         // Arrange
         var estimate = new ProjectEstimate 
@@ -153,16 +156,17 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
+        var controller = new CreateProjectEstimatesController(_context);
+        var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
         var createdEstimate = Assert.IsType<ProjectEstimate>(createdResult.Value);
-        Assert.Equal(7200m, createdEstimate.EstimatedCost); // 1800 * 4.0 = 7200
+        Assert.Equal(7200m, createdEstimate.TotalEstimatedCost); // 1800 * 4.0 = 7200
     }
 
     [Fact]
-    public async Task CreateProjectEstimate_RecurringService_Maintenance_CalculatesCorrectPrice()
+    public async Task CreateProjectEstimate_RecurringService_Maintenance_CalculatesCorrectMonthlyCost()
     {
         // Arrange
         var estimate = new ProjectEstimate 
@@ -172,51 +176,23 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
             ClientEmail = "alice@test.com",
             EstimateKind = "RecurringService",
             ServiceType = "Maintenance",
-            ProjectType = "Standard",
-            EstimatedHours = 8,
-            MaterialCost = 50m,
-            EquipmentCost = 25m,
-            TravelCost = 15m
+            PerVisitCost = 690m,
+            VisitsPerMonth = 1
         };
 
         // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
+        var controller = new CreateProjectEstimatesController(_context);
+        var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
         var createdEstimate = Assert.IsType<ProjectEstimate>(createdResult.Value);
-        Assert.Equal(690m, createdEstimate.EstimatedCost); // (75 * 8 * 1.0) + 50 + 25 + 15 = 690
+        Assert.Equal(690m, createdEstimate.MonthlyEstimatedCost); // 690 * 1 = 690
     }
 
-    [Fact]
-    public async Task CreateProjectEstimate_RecurringService_Repair_Peak_CalculatesCorrectPrice()
-    {
-        // Arrange
-        var estimate = new ProjectEstimate 
-        { 
-            ProjectName = "Emergency Repair", 
-            ClientName = "Charlie Davis", 
-            ClientEmail = "charlie@test.com",
-            EstimateKind = "RecurringService",
-            ServiceType = "Repair",
-            ProjectType = "Peak",
-            EstimatedHours = 4,
-            MaterialCost = 100m,
-            EquipmentCost = 50m,
-            TravelCost = 20m
-        };
-
-        // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
-
-        // Assert
-        var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
-        var createdEstimate = Assert.IsType<ProjectEstimate>(createdResult.Value);
-        Assert.Equal(830m, createdEstimate.EstimatedCost); // (95 * 4 * 2.0) + 100 + 50 + 20 = 830
-    }
 
     [Fact]
-    public async Task CreateProjectEstimate_RecurringService_Recurring_AppliesDiscount()
+    public async Task CreateProjectEstimate_RecurringService_Recurring_CalculatesCorrectMonthlyCost()
     {
         // Arrange
         var estimate = new ProjectEstimate 
@@ -226,25 +202,23 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
             ClientEmail = "david@test.com",
             EstimateKind = "RecurringService",
             ServiceType = "Maintenance",
-            ProjectType = "Standard",
-            EstimatedHours = 6,
-            MaterialCost = 30m,
-            EquipmentCost = 20m,
-            TravelCost = 10m,
+            PerVisitCost = 459m,
+            VisitsPerMonth = 1,
             IsRecurring = true
         };
 
         // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
+        var controller = new CreateProjectEstimatesController(_context);
+        var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
         var createdEstimate = Assert.IsType<ProjectEstimate>(createdResult.Value);
-        Assert.Equal(540m, createdEstimate.EstimatedCost); // ((75 * 6 * 1.0) + 30 + 20 + 10) * 0.9 = 540
+        Assert.Equal(459m, createdEstimate.MonthlyEstimatedCost); // 459 * 1 = 459
     }
 
     [Fact]
-    public async Task CreateProjectEstimate_InvalidEstimateKind_ReturnsZero()
+    public async Task CreateProjectEstimate_InvalidEstimateKind_ReturnsBadRequest()
     {
         // Arrange
         var estimate = new ProjectEstimate 
@@ -258,24 +232,24 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var result = await _controller.CreateProjectEstimate(estimate);
+        var controller = new CreateProjectEstimatesController(_context);
+        var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
-        var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
-        var createdEstimate = Assert.IsType<ProjectEstimate>(createdResult.Value);
-        Assert.Equal(0m, createdEstimate.EstimatedCost);
+        Assert.IsType<BadRequestResult>(result.Result);
     }
 
     [Fact]
     public async Task DeleteProjectEstimate_WithValidId_DeletesEstimate()
     {
         // Arrange
-        var estimate = new ProjectEstimate { ProjectName = "To Delete", ClientName = "John Doe", ClientEmail = "john@test.com", EstimatedCost = 10000 };
+        var estimate = new ProjectEstimate { ProjectName = "To Delete", ClientName = "John Doe", ClientEmail = "john@test.com", TotalEstimatedCost = 10000 };
         _context.ProjectEstimates.Add(estimate);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _controller.DeleteProjectEstimate(estimate.Id);
+        var controller = new DeleteProjectEstimateController(_context);
+        var result = await controller.DeleteProjectEstimate(estimate.Id);
 
         // Assert
         Assert.IsType<NoContentResult>(result);

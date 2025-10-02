@@ -5,22 +5,32 @@ using SimpleApi.Models;
 
 namespace SimpleApi.Controllers;
 
+// create a base api controller class which has the base route
+[Route("api/ProjectEstimates")]
 [ApiController]
-[Route("api/[controller]")]
-public class ProjectEstimatesController(ProjectContext context) : ControllerBase
-{
-    private readonly ProjectContext _context = context;
+public class BaseProjectEstimatesController : ControllerBase
+{   protected bool ProjectEstimateExists(ProjectContext context, int id)
+    {
+        return context.ProjectEstimates.Any(e => e.Id == id);
+    }
+}
 
+public class GetProjectEstimatesController(ProjectContext context) : BaseProjectEstimatesController
+{
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectEstimate>>> GetProjectEstimates()
     {
-        return Ok(await _context.ProjectEstimates.ToListAsync());
+        return Ok(await context.ProjectEstimates.ToListAsync());
     }
+}
+
+public class GetProjectEstimateController(ProjectContext context) : BaseProjectEstimatesController
+{
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectEstimate>> GetProjectEstimate(int id)
     {
-        var estimate = await _context.ProjectEstimates.FindAsync(id);
+        var estimate = await context.ProjectEstimates.FindAsync(id);
         
         if (estimate == null)
         {
@@ -29,23 +39,37 @@ public class ProjectEstimatesController(ProjectContext context) : ControllerBase
 
         return Ok(estimate);
     }
+}
 
+public class CreateProjectEstimatesController(ProjectContext context) : BaseProjectEstimatesController
+{
     [HttpPost]
     public async Task<ActionResult<ProjectEstimate>> CreateProjectEstimate(ProjectEstimate estimate)
     {
         // Calculate pricing based on estimate kind
-        estimate.EstimatedCost = CalculatePricing(estimate);
+        var cost = CalculatePricing(estimate);
+        if(estimate.EstimateKind == "DesignBuild")
+        {
+            estimate.TotalEstimatedCost = cost;
+        }
+        else if(estimate.EstimateKind == "RecurringService")
+        {
+            estimate.MonthlyEstimatedCost = cost;
+        }
+        else
+        {
+            return BadRequest();
+        }
         
-        _context.ProjectEstimates.Add(estimate);
-        await _context.SaveChangesAsync();
+        context.ProjectEstimates.Add(estimate);
+        await context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetProjectEstimate), new { id = estimate.Id }, estimate);
+        return CreatedAtAction(nameof(CreateProjectEstimate), new { id = estimate.Id }, estimate);
     }
-
     /// <summary>
     /// Calculate pricing for both design-build and service estimates
     /// </summary>
-    private decimal CalculatePricing(ProjectEstimate estimate)
+    private static decimal CalculatePricing(ProjectEstimate estimate)
     {
         // Set base price based on estimate kind
         decimal basePrice;
@@ -61,18 +85,7 @@ public class ProjectEstimatesController(ProjectContext context) : ControllerBase
         }
         else if (estimate.EstimateKind == "RecurringService")
         {
-            // Base hourly rate by service type
-            var baseHourlyRate = estimate.ServiceType switch
-            {
-                "Maintenance" => 75m,
-                "Repair" => 95m,
-                "Installation" => 120m,
-                "Consultation" => 150m,
-                _ => 75m // Default to Maintenance
-            };
-
-            // Calculate base labor cost
-            basePrice = baseHourlyRate * estimate.EstimatedHours;
+            basePrice = estimate.PerVisitCost * estimate.VisitsPerMonth;
         }
         else
         {
@@ -82,32 +95,23 @@ public class ProjectEstimatesController(ProjectContext context) : ControllerBase
         // Apply multipliers based on project type
         var multiplier = estimate.ProjectType switch
         {
-            "Custom" => estimate.EstimateKind == "DesignBuild" ? 2.0m : 1.5m,
-            "Peak" => estimate.EstimateKind == "DesignBuild" ? 4.0m : 2.0m,
-            "OffSeason" => estimate.EstimateKind == "DesignBuild" ? 0.8m : 0.7m,
-            "Rush" => estimate.EstimateKind == "DesignBuild" ? 3.2m : 1.8m,
-            "Emergency" => estimate.EstimateKind == "DesignBuild" ? 4.8m : 2.5m,
+            "Custom" => estimate.EstimateKind == "DesignBuild" ? 2.0m : 1m,
+            "Peak" => estimate.EstimateKind == "DesignBuild" ? 4.0m : 1m,
+            "OffSeason" => estimate.EstimateKind == "DesignBuild" ? 0.8m : 1m,
+            "Rush" => estimate.EstimateKind == "DesignBuild" ? 3.2m : 1m,
+            "Emergency" => estimate.EstimateKind == "DesignBuild" ? 4.8m : 1m,
             _ => 1.0m // Standard
         };
 
         // Calculate total cost
         var totalCost = basePrice * multiplier;
 
-        // Add additional costs for recurring service estimates
-        if (estimate.EstimateKind == "RecurringService")
-        {
-            totalCost += estimate.MaterialCost + estimate.EquipmentCost + estimate.TravelCost;
-
-            // Apply recurring service discount
-            if (estimate.IsRecurring)
-            {
-                totalCost *= 0.9m; // 10% discount for recurring services
-            }
-        }
-
         return totalCost;
     }
+}
 
+public class UpdateProjectEstimateController(ProjectContext context) : BaseProjectEstimatesController
+{
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProjectEstimate(int id, ProjectEstimate estimate)
     {
@@ -116,15 +120,15 @@ public class ProjectEstimatesController(ProjectContext context) : ControllerBase
             return BadRequest();
         }
 
-        _context.Entry(estimate).State = EntityState.Modified;
+        context.Entry(estimate).State = EntityState.Modified;
 
         try
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!ProjectEstimateExists(id))
+            if (!ProjectEstimateExists(context, id))
             {
                 return NotFound();
             }
@@ -133,25 +137,22 @@ public class ProjectEstimatesController(ProjectContext context) : ControllerBase
 
         return NoContent();
     }
+}
 
+public class DeleteProjectEstimateController(ProjectContext context) : BaseProjectEstimatesController
+{
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProjectEstimate(int id)
     {
-        var estimate = await _context.ProjectEstimates.FindAsync(id);
+        var estimate = await context.ProjectEstimates.FindAsync(id);
         if (estimate == null)
         {
             return NotFound();
         }
 
-        _context.ProjectEstimates.Remove(estimate);
-        await _context.SaveChangesAsync();
+        context.ProjectEstimates.Remove(estimate);
+        await context.SaveChangesAsync();
 
         return NoContent();
     }
-
-    private bool ProjectEstimateExists(int id)
-    {
-        return _context.ProjectEstimates.Any(e => e.Id == id);
-    }
-
 }
