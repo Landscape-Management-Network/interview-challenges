@@ -35,7 +35,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         await _context.SaveChangesAsync();
 
         // Act
-        var controller = new GetProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.GetProjectEstimates();
 
         // Assert
@@ -53,7 +53,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         await _context.SaveChangesAsync();
 
         // Act
-        var controller = new GetProjectEstimateController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.GetProjectEstimate(estimate.Id);
 
         // Assert
@@ -66,7 +66,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
     public async Task GetProjectEstimate_WithInvalidId_ReturnsNotFound()
     {
         // Act
-        var controller = new GetProjectEstimateController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.GetProjectEstimate(999);
 
         // Assert
@@ -80,7 +80,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         var estimate = new ProjectEstimate { ProjectName = "New Project", ClientName = "John Doe", ClientEmail = "john@test.com", TotalEstimatedCost = 25000 };
 
         // Act
-        var controller = new CreateProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
@@ -108,7 +108,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var controller = new CreateProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
@@ -132,7 +132,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var controller = new CreateProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
@@ -156,7 +156,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var controller = new CreateProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
@@ -181,7 +181,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var controller = new CreateProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
@@ -208,7 +208,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var controller = new CreateProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
@@ -232,7 +232,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         };
 
         // Act
-        var controller = new CreateProjectEstimatesController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.CreateProjectEstimate(estimate);
 
         // Assert
@@ -248,7 +248,7 @@ public sealed class ProjectEstimatesControllerTests : IDisposable
         await _context.SaveChangesAsync();
 
         // Act
-        var controller = new DeleteProjectEstimateController(_context);
+        var controller = new ProjectEstimatesController(_context);
         var result = await controller.DeleteProjectEstimate(estimate.Id);
 
         // Assert

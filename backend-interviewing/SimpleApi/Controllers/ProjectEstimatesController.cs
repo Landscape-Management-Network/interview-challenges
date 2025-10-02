@@ -6,31 +6,32 @@ using SimpleApi.Models;
 namespace SimpleApi.Controllers;
 
 // create a base api controller class which has the base route
-[Route("api/ProjectEstimates")]
+[Route("api/{controller}")]
 [ApiController]
-public class BaseProjectEstimatesController : ControllerBase
-{   protected bool ProjectEstimateExists(ProjectContext context, int id)
-    {
-        return context.ProjectEstimates.Any(e => e.Id == id);
-    }
-}
-
-public class GetProjectEstimatesController(ProjectContext context) : BaseProjectEstimatesController
+public class ProjectEstimatesController : ControllerBase
 {
+    private readonly ProjectContext _context;
+
+    public ProjectEstimatesController(ProjectContext context)
+    {
+        _context = context;
+    }
+    protected bool ProjectEstimateExists(int id)
+    {
+        return _context.ProjectEstimates.Any(e => e.Id == id);
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectEstimate>>> GetProjectEstimates()
     {
-        return Ok(await context.ProjectEstimates.ToListAsync());
+        return Ok(await _context.ProjectEstimates.ToListAsync());
     }
-}
 
-public class GetProjectEstimateController(ProjectContext context) : BaseProjectEstimatesController
-{
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectEstimate>> GetProjectEstimate(int id)
     {
-        var estimate = await context.ProjectEstimates.FindAsync(id);
+        var estimate = await _context.ProjectEstimates.FindAsync(id);
         
         if (estimate == null)
         {
@@ -39,10 +40,7 @@ public class GetProjectEstimateController(ProjectContext context) : BaseProjectE
 
         return Ok(estimate);
     }
-}
 
-public class CreateProjectEstimatesController(ProjectContext context) : BaseProjectEstimatesController
-{
     [HttpPost]
     public async Task<ActionResult<ProjectEstimate>> CreateProjectEstimate(ProjectEstimate estimate)
     {
@@ -61,8 +59,8 @@ public class CreateProjectEstimatesController(ProjectContext context) : BaseProj
             return BadRequest();
         }
         
-        context.ProjectEstimates.Add(estimate);
-        await context.SaveChangesAsync();
+        _context.ProjectEstimates.Add(estimate);
+        await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(CreateProjectEstimate), new { id = estimate.Id }, estimate);
     }
@@ -108,10 +106,7 @@ public class CreateProjectEstimatesController(ProjectContext context) : BaseProj
 
         return totalCost;
     }
-}
 
-public class UpdateProjectEstimateController(ProjectContext context) : BaseProjectEstimatesController
-{
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProjectEstimate(int id, ProjectEstimate estimate)
     {
@@ -120,15 +115,15 @@ public class UpdateProjectEstimateController(ProjectContext context) : BaseProje
             return BadRequest();
         }
 
-        context.Entry(estimate).State = EntityState.Modified;
+        _context.Entry(estimate).State = EntityState.Modified;
 
         try
         {
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!ProjectEstimateExists(context, id))
+            if (!ProjectEstimateExists(id))
             {
                 return NotFound();
             }
@@ -137,21 +132,18 @@ public class UpdateProjectEstimateController(ProjectContext context) : BaseProje
 
         return NoContent();
     }
-}
 
-public class DeleteProjectEstimateController(ProjectContext context) : BaseProjectEstimatesController
-{
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProjectEstimate(int id)
     {
-        var estimate = await context.ProjectEstimates.FindAsync(id);
+        var estimate = await _context.ProjectEstimates.FindAsync(id);
         if (estimate == null)
         {
             return NotFound();
         }
 
-        context.ProjectEstimates.Remove(estimate);
-        await context.SaveChangesAsync();
+        _context.ProjectEstimates.Remove(estimate);
+        await _context.SaveChangesAsync();
 
         return NoContent();
     }
