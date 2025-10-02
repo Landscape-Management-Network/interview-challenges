@@ -49,7 +49,3 @@ Add a new pricing model for on-demand work to the existing landscaping estimatio
 - **Business Logic**: Designing appropriate pricing models
 - **Testing Skills**: Writing comprehensive tests for new features
 - **Code Quality**: Writing clean, maintainable code
-
-### Time Estimate
-- **Target**: 30-45 minutes
-- **Focus**: Implementing on-demand work pricing functionality
