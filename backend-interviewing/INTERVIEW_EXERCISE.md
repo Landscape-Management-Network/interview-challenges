@@ -6,13 +6,15 @@ You are working with a landscaping estimation system that calculates pricing for
 ## Exercise: Add On-Demand Work Pricing
 
 ### Your Task
-Add the ability to save and retrieve pricing for on-demand work and calculate the monthly price for on-demand work to the existing landscaping estimation system. The current implementation may have some areas that could be improved, so feel free to refactor as needed while adding the new functionality. This should include:
+Add the ability to save and retrieve pricing for on-demand work and calculate the monthly price for on-demand work to the existing landscaping estimation system. The current implementation has many areas that should be improved, so feel free to refactor if needed to add the new functionality. This should include:
 
-- Implementing the monthly pricing calculation logic for on-demand work
-- Ensuring the new model integrates with existing functionality
+- Implementing the per-service pricing calculation logic for on-demand work
+- Ensuring the logic integrates with existing functionality
 - Adding appropriate test coverage
 - Maintaining code quality and maintainability
-- Refactoring existing code if you identify opportunities for improvement
+- Refactoring existing code if you identify opportunities for improvement (time permitting)
+
+You might need to change the existing data model to accomplish this task.
 
 ### Types of Pricing
 - Design/Build - design and then build a project for a customer e.g. add a deck to a house (already exists)
@@ -34,18 +36,3 @@ Add the ability to save and retrieve pricing for on-demand work and calculate th
 - **Scope**: Review existing code and add on-demand work as a new pricing model
 - **No Breaking Changes**: Maintain backward compatibility
 - **Focus**: Code quality, maintainability, and business logic correctness
-
-### Success Criteria
-- Implement on-demand work pricing logic
-- Ensure integration with existing pricing models
-- Add comprehensive test coverage for the new functionality
-- Maintain backward compatibility with existing features
-- Consider edge cases and error handling
-- Write clean, maintainable code
-
-### What This Tests
-- **Feature Implementation**: Ability to add new functionality to existing code
-- **Code Integration**: Understanding how to extend existing systems
-- **Business Logic**: Designing appropriate pricing models
-- **Testing Skills**: Writing comprehensive tests for new features
-- **Code Quality**: Writing clean, maintainable code

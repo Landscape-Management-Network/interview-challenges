@@ -91,15 +91,19 @@ public class ProjectEstimatesController : ControllerBase
         }
 
         // Apply multipliers based on project type
-        var multiplier = estimate.ProjectType switch
+        var multiplier = 1.0m;
+        if(estimate.EstimateKind == "DesignBuild")
         {
-            "Custom" => estimate.EstimateKind == "DesignBuild" ? 2.0m : 1m,
-            "Peak" => estimate.EstimateKind == "DesignBuild" ? 4.0m : 1m,
-            "OffSeason" => estimate.EstimateKind == "DesignBuild" ? 0.8m : 1m,
-            "Rush" => estimate.EstimateKind == "DesignBuild" ? 3.2m : 1m,
-            "Emergency" => estimate.EstimateKind == "DesignBuild" ? 4.8m : 1m,
-            _ => 1.0m // Standard
-        };
+            multiplier = estimate.ProjectType switch
+            {
+                "Custom" => 2.0m,
+                "Peak" => 4.0m,
+                "OffSeason" => 0.8m,
+                "Rush" => 3.2m,
+                "Emergency" => 4.8m,
+                _ => 1.0m
+            };
+        }
 
         // Calculate total cost
         var totalCost = basePrice * multiplier;
